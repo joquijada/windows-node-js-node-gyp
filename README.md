@@ -1,5 +1,5 @@
 # Node JS on Windows+Cygwin
-> This repo captures my trials and tribulations trying to success install a Node.js application that depended on a native Node.js module, [re2](http://github.com/uhop/node-re2) in this case, and that makes use of [node-gyp](https://github.com/nodejs/node-gyp) for compilation of `C++` code needed for [Node.js addons](https://nodejs.org/api/addons.html).
+> This repo captures my trials and tribulations trying to successfully install a Node.js application that depended on a native Node.js module, [re2](http://github.com/uhop/node-re2) in this case, which makes use of [node-gyp](https://github.com/nodejs/node-gyp) for compilation of `C++` code, needed for [Node.js addons](https://nodejs.org/api/addons.html).
 
 **Disclaimer/Caution: My approach modifying source code in the stock `node-gyp@v5.0.0` installation. Read/use this guide at your own leisure, it's not a guarantee that it will solve your issues. Ultimately you're responsible for resolving them, and making any back ups as necessary. Use this document mostly for informational purposes and I really wish it helps somebody.**
 
