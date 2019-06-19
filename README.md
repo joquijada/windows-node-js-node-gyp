@@ -46,13 +46,15 @@ npm verb lifecycle re2@1.8.4~install: unsafe-perm in lifecycle true
 ```
 
 * **File(s) Changed** [.node-gyp/gyp/gyp_main.py](.node-gyp/gyp/gyp_main.py)
-* **Issue Description** Read the comments in the file itself. Use @edmorley observed similar, see [his comment](https://github.com/nodejs/node-gyp/issues/740#issuecomment-142467289)
+* **Issue Description** Read the comments in the file itself. User [@edmorley](https://github.com/nodejs/node-gyp/issues/740#issuecomment-142467289) observed similar, see [his comment](https://github.com/nodejs/node-gyp/issues/740#issuecomment-142467289)
 
 
 ### AttributeError: 'NoneType' object has no attribute 'upper'
 
 * **File(s) Changed** None
 * **Issue Description** This happened only when I ran `npm install` in a Windows CMD shell. The fix was to set locale in the environment, `set LC_ALL=en_US.UTF-8`. On a Cygwin shell I did not experience this at all
+
+**Note: On `PowerShell` the syntax for setting environment variables is `$Env:<var name>=<var val>`.
 
 ### OSError: [Errno 2] No such file or directory: ... build/binding.sln.Xyz.tmp
 
@@ -74,10 +76,10 @@ I heeded the advice given [here](https://github.com/Microsoft/nodejs-guidelines/
 
 * **File(s) Changed** Nothing changed, I just added the missing `*.h` files in the place where Microsoft SDK expects them. In my case I'm using `Visual Studio 2017 Professional`, and this is the parent path where I put them: `C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.15.26726\include`.
 You'll have to do some digging to see exactly what version you're using and the path to put them in. I just Google'ed around for that.
-For your convenience I've checked the [header files I needed in this repo](.include/), find him here. They follow the same relative folder hierarchy that they should be in once installed into their final destination on the target machine.
-I found many of the missing `*.h` files at [https://raw.githubusercontent.com/nodejs](https://raw.githubusercontent.com/nodejs). Others came with `node-gyp`, but you can find them only the Windows "cache" area of this package, it may be something like `C:\Users\<your user id>\AppData\Local\node-gyp\Cache\11.9.0\include` or `C:\Users\<your user id>\.node-gyp\11.9.0\include\node`
+For your convenience I've checked the [header files I needed in this repo](.include/), find him [here](.include/). They follow the same relative folder hierarchy that they should be in once installed into their final destination on the target machine.
+I found many of the missing `*.h` files at [https://raw.githubusercontent.com/nodejs](https://raw.githubusercontent.com/nodejs). Others came with `node-gyp`, but I was able to find them only in a special area of the Windows "cache" that may be something like `C:\Users\<your user id>\AppData\Local\node-gyp\Cache\11.9.0\include` or `C:\Users\<your user id>\.node-gyp\11.9.0\include\node`
 
-* **Issue Description** Some of the `C++` in `<your module>/node_modules/re2/lib/` will fail to compile until all missing header (`*.h`) files are found.
+* **Issue Description** Some of the `C++` in `<your module>/node_modules/re2/lib/` will fail to compile until all missing header (`*.h`) files are found, simple as that and no way around it. I guess it's a fact of life for those of us having to develop Node.js on Windows machines. Perhaps soon the Node.js team will address this in a more automated manner.
 
 ### LINK : fatal error LNK1181: cannot open input file
 
