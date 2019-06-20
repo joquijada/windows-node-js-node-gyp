@@ -34,8 +34,10 @@ Below sections cover the issues encountered and files modified for each, in the 
 
 `npm config set custom_logic true`
 
-### ImportError: No module named gyp
 ---
+
+### ImportError: No module named gyp
+
 ```
 ImportError: No module named gyp
 gyp ERR! configure error
@@ -54,17 +56,17 @@ npm verb lifecycle re2@1.8.4~install: unsafe-perm in lifecycle true
 
 * **File(s) Changed** [.node-gyp/gyp/gyp_main.py](.node-gyp/gyp/gyp_main.py)
 * **Issue Description** Read the comments in the file itself. User [@edmorley](https://github.com/nodejs/node-gyp/issues/740#issuecomment-142467289) observed similar, see [his comment](https://github.com/nodejs/node-gyp/issues/740#issuecomment-142467289)
-
+---
 
 ### AttributeError: 'NoneType' object has no attribute 'upper'
----
+
 * **File(s) Changed** None
 * **Issue Description** This happened only when I ran `npm install` in a Windows CMD shell. The fix was to set locale in the environment, `set LC_ALL=en_US.UTF-8`. On a Cygwin shell I did not experience this at all
 
 **Note: On `PowerShell` the syntax for setting environment variables is `$Env:<var name>=<var val>`.**
+---
 
 ### OSError: [Errno 2] No such file or directory: ... build/binding.sln.Xyz.tmp
-
 ```
 File "/cygdrive/c/Users/<my id>/AppData/Roaming/npm/node_modules/node-gyp/gyp/pylib/gyp/MSVSNew.py", line 213, in __init__
    self.Write()
@@ -77,10 +79,9 @@ OSError: [Errno 2] No such file or directory: '/cygdrive/c/.../<pkg name>/node_m
 
 * **File(s) Changed** [.node-gyp/gyp/pylib/gyp/common.py](.node-gyp/gyp/pylib/gyp/common.py)
 * **Issue Description** Read the comments in [this file](.node-gyp/gyp/pylib/gyp/common.py), search for `CUSTOM: Removed the "dir" argument because`
-
+---
 
 ###  error MSB4184: The expression "[System.IO.Path]::GetFullPath
----
 >Bellow is fuller error message, where you see `...\<my module name>` it's redactions I made to hide company secrets
 
 ```
@@ -122,9 +123,9 @@ if (fixpath_prefix and path and not os.path.isabs(path)
   path = os.path.join(fixpath_prefix, path)
 ...
 ```
+---
 
 ### Missing C/C++ header files
----
 I heeded the advice given [here](https://github.com/Microsoft/nodejs-guidelines/blob/master/windows-environment.md#compiling-native-addon-modules), search for `Missing command or *.h file`
 
 * **File(s) Changed** Nothing changed, I just added the missing `*.h` files in the place where Microsoft SDK expects them. In my case I'm using `Visual Studio 2017 Professional`, and this is the parent path where I put them: `C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.15.26726\include`.
@@ -133,9 +134,9 @@ For your convenience I've checked the [header files I needed in this repo](.incl
 I found many of the missing `*.h` files at [https://raw.githubusercontent.com/nodejs](https://raw.githubusercontent.com/nodejs). Others came with `node-gyp`, but I was able to find them only in a special area of the Windows "cache" that may be something like `C:\Users\<your user id>\AppData\Local\node-gyp\Cache\11.9.0\include` or `C:\Users\<your user id>\.node-gyp\11.9.0\include\node`
 
 * **Issue Description** Some of the `C++` in `<your module>/node_modules/re2/lib/` will fail to compile until all missing header (`*.h`) files are found, simple as that and no way around it. I guess it's a fact of life for those of us having to develop Node.js on Windows machines. Perhaps soon the Node.js team will address this in a more automated manner.
+---
 
 ### LINK : fatal error LNK1181: cannot open input file
----
 **File(s) Changed** [.node-gyp/lib/configure.js](.node-gyp/lib/configure.js)
 
 * **Issue Description** The node lib path in the ` <AdditionalDependencies/>` node of the MS project XML file was getting messed up because the Windows style path backslashes were not escaped. For example:
@@ -144,9 +145,9 @@ There were probably other ways of dealing with this, but I went ahead and added 
 
 ## Other tips
 Some other tips that can help make your life easier.
+---
 
 ### Installing `Desktop development with C++`
----
 If you already have `Microsoft Visual Studio` installed but `npm install` warns about not being able to find the compiler, open `Microsoft Visual Studio`, enter `Desktop development with C++` in the search box, and then click to install. It was that easy for me on `Microsoft Visual Studio 2017 Professional`.
 
 ## Feedback
