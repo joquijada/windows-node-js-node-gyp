@@ -154,7 +154,7 @@ I found many of the missing `*.h` files at [https://raw.githubusercontent.com/no
 ---
 
 ### 2.6 LINK : fatal error LNK1181: cannot open input file
-**File(s) Changed** [.node-gyp/lib/configure.js](.node-gyp/lib/configure.js)
+* **File(s) Changed** [.node-gyp/lib/configure.js](.node-gyp/lib/configure.js)
 
 * **Issue Description** The node lib path in the ` <AdditionalDependencies/>` node of the MS project XML file was getting messed up because the Windows style path backslashes were not escaped. For example, `C:Usersv094303AppDataLocalnode-gypCache11.9.0x64node.lib` in XML snippet below from the `<your package>/node_modules/re2/build/re2.vcxproj`, `before` and `after` snippets provided for comparison:
 
