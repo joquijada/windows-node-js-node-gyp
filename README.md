@@ -5,15 +5,32 @@
 
 If you're like me and have already spent days trying to get Node.js applications that rely on native Node.js modules to successfully install on a Windows+Cygwin combo (perhaps even just Windows alone), then read on, as this may benefit you. I had created [a GitHub issue for this as well](https://github.com/nodejs/node-gyp/issues/1782).
 
+<!-- MDTOC maxdepth:6 firsth1:1 numbering:0 flatten:0 bullets:1 updateOnSave:1 -->
 
-## What help is already out there?
+- [Node JS on Windows+Cygwin](#node-js-on-windowscygwin)   
+   - [1. What help is already out there?](#1-what-help-is-already-out-there)   
+   - [2. So what did I do about it?](#2-so-what-did-i-do-about-it)   
+      - [2.1 ImportError: No module named gyp](#21-importerror-no-module-named-gyp)   
+      - [2.2 AttributeError: 'NoneType' object has no attribute 'upper'](#22-attributeerror-nonetype-object-has-no-attribute-upper) 
+      - [2.3 OSError: [Errno 2] No such file or directory: ... build/binding.sln.Xyz.tmp](#23-oserror-errno-2-no-such-file-or-directory-buildbindingslnxyztmp)   
+      - [2.4 error MSB4184: The expression "[System.IO.Path]::GetFullPath](#24-error-msb4184-the-expression-systemiopathgetfullpath)   
+      - [2.5 Missing C/C++ header files](#25-missing-cc-header-files)   
+      - [2.6 LINK : fatal error LNK1181: cannot open input file](#26-link-fatal-error-lnk1181-cannot-open-input-file)   
+   - [3. Other tips](#3-other-tips)   
+   - [Some other tips that can help make your life easier.](#some-other-tips-that-can-help-make-your-life-easier)   
+      - [3.1 Installing `Desktop development with C++`](#31-installing-desktop-development-with-c)   
+   - [4. Feedback](#4-feedback)   
+
+<!-- /MDTOC -->
+
+## 1. What help is already out there?
 
 The good news is that the Node.js community is already aware of some of the challenges faced with Node.js+Windows+native addons.
 This README is based on [this guide](https://github.com/Microsoft/nodejs-guidelines/blob/master/windows-environment.md#compiling-native-addon-modules) which helps users troubleshoot Node.js issues on a Windows platform.
 However my situation was exacerbated by the fact that I sit inside an internal corporate network which governing team does not grant administrative rights that easily, if at all. Many solutions out there require administrative rights on your Windows machine (for example see `Option 1: Install all the required tools and configurations using Microsoft's windows-build-tools by running npm install -g windows-build-tools from an elevated PowerShell (run as Administrator).` in [this guide](https://github.com/Microsoft/nodejs-guidelines/blob/master/windows-environment.md#compiling-native-addon-modules)), of which I had none whatsoever. This meant that my options where severely abbreviated. For example I couldn't install the [windows build tools package](https://github.com/felixrieseberg/windows-build-tools) which might have alleviated my pain and suffering quicker. Instead I had to go for `Option 2: Install dependencies and configuration manually` described in [this document](https://github.com/Microsoft/nodejs-guidelines/blob/master/windows-environment.md#compiling-native-addon-modules).
 I had also created [a GitHub issue](https://github.com/nodejs/node-gyp/issues/1782) seeking for some help.
 
-## So what did I do about it?
+## 2. So what did I do about it?
 Firs off, some hardware/software versions I work with:
 
 * **Operating System** Microsoft Windows 10 Enterprise
@@ -30,13 +47,13 @@ All the files I modified are in a hidden .node-gyp folder of this repo which ove
 
 Below sections cover the issues encountered and files modified for each, in the order encountered. In the code I've added comments with the tag `CUSTOM:`, to identify code that I touched.
 
-**In addition, if you d decide to install the files I made things flag driven, so that you can easily/auto-magically toggle on/off the fixes made. To toggle on, set following `npm` environment flag:**
+**In addition, if you do decide to install the files I made things flag driven, so that you can easily/auto-magically toggle on/off the fixes made. To toggle on, set following `npm` environment flag:**
 
 `npm config set custom_logic true`
 
 ---
 
-### ImportError: No module named gyp
+### 2.1 ImportError: No module named gyp
 
 ```
 ImportError: No module named gyp
@@ -58,15 +75,15 @@ npm verb lifecycle re2@1.8.4~install: unsafe-perm in lifecycle true
 * **Issue Description** Read the comments in the file itself. User [@edmorley](https://github.com/nodejs/node-gyp/issues/740#issuecomment-142467289) observed similar, see [his comment](https://github.com/nodejs/node-gyp/issues/740#issuecomment-142467289)
 ---
 
-### AttributeError: 'NoneType' object has no attribute 'upper'
+### 2.2 AttributeError: 'NoneType' object has no attribute 'upper'
 
 * **File(s) Changed** None
 * **Issue Description** This happened only when I ran `npm install` in a Windows CMD shell. The fix was to set locale in the environment, `set LC_ALL=en_US.UTF-8`. On a Cygwin shell I did not experience this at all
 
-**Note: On `PowerShell` the syntax for setting environment variables is `$Env:<var name>=<var val>`.**
+> Note: On `PowerShell` the syntax for setting environment variables is `$Env:<var name>=<var val>`.
 ---
 
-### OSError: [Errno 2] No such file or directory: ... build/binding.sln.Xyz.tmp
+### 2.3 OSError: [Errno 2] No such file or directory: ... build/binding.sln.Xyz.tmp
 ```
 File "/cygdrive/c/Users/<my id>/AppData/Roaming/npm/node_modules/node-gyp/gyp/pylib/gyp/MSVSNew.py", line 213, in __init__
    self.Write()
@@ -81,7 +98,7 @@ OSError: [Errno 2] No such file or directory: '/cygdrive/c/.../<pkg name>/node_m
 * **Issue Description** Read the comments in [this file](.node-gyp/gyp/pylib/gyp/common.py), search for `CUSTOM: Removed the "dir" argument because`
 ---
 
-###  error MSB4184: The expression "[System.IO.Path]::GetFullPath
+### 2.4 error MSB4184: The expression "[System.IO.Path]::GetFullPath
 >Bellow is fuller error message, where you see `...\<my module name>` it's redactions I made to hide company secrets
 
 ```
@@ -125,7 +142,7 @@ if (fixpath_prefix and path and not os.path.isabs(path)
 ```
 ---
 
-### Missing C/C++ header files
+### 2.5 Missing C/C++ header files
 I heeded the advice given [here](https://github.com/Microsoft/nodejs-guidelines/blob/master/windows-environment.md#compiling-native-addon-modules), search for `Missing command or *.h file`
 
 * **File(s) Changed** Nothing changed, I just added the missing `*.h` files in the place where Microsoft SDK expects them. In my case I'm using `Visual Studio 2017 Professional`, and this is the parent path where I put them: `C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.15.26726\include`.
@@ -136,20 +153,20 @@ I found many of the missing `*.h` files at [https://raw.githubusercontent.com/no
 * **Issue Description** Some of the `C++` in `<your module>/node_modules/re2/lib/` will fail to compile until all missing header (`*.h`) files are found, simple as that and no way around it. I guess it's a fact of life for those of us having to develop Node.js on Windows machines. Perhaps soon the Node.js team will address this in a more automated manner.
 ---
 
-### LINK : fatal error LNK1181: cannot open input file
+### 2.6 LINK : fatal error LNK1181: cannot open input file
 **File(s) Changed** [.node-gyp/lib/configure.js](.node-gyp/lib/configure.js)
 
 * **Issue Description** The node lib path in the ` <AdditionalDependencies/>` node of the MS project XML file was getting messed up because the Windows style path backslashes were not escaped. For example:
 `C:Usersv094303AppDataLocalnode-gypCache11.9.0x64node.lib`
 There were probably other ways of dealing with this, but I went ahead and added the escaping logic in `configure.js`. Refer to [that file](.node-gyp/lib/configure.js) and search for the `CUSTOM:` tag for details on the fix.
 
-## Other tips
+## 3. Other tips
 
 Some other tips that can help make your life easier.
 ---
 
-### Installing `Desktop development with C++`
+### 3.1 Installing `Desktop development with C++`
 If you already have `Microsoft Visual Studio` installed but `npm install` warns about not being able to find the compiler, open `Microsoft Visual Studio`, enter `Desktop development with C++` in the search box, and then click to install. It was that easy for me on `Microsoft Visual Studio 2017 Professional`.
 
-## Feedback
+## 4. Feedback
 Questions/comments/PR's always welcomed.
