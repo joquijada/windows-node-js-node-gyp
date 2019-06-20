@@ -24,7 +24,7 @@ Firs off, some hardware/software versions I work with:
 * **node-gyp** 5.0.0 as of the time I wrote this (I have this installed globally, `npm install -g node-gyp`)
 * **Microsoft SDK Tools** Microsoft Visual Studio Professional 2017 v15.8.7/Desktop development with C++ workload
 
-To make a long story short and after hours of painstaking debugging Python and JavaScript code and running `npm install` with `--verbose` flag, I ended up having to manually modify a handful of Python files that come with the `node-gyp` installation, plus a JavaScript Node.js file as well, and also installing missing C header `*.h` files.
+To make a long story short and after hours of painstaking debugging Python and JavaScript code and running `npm install` with `--verbose` flag, I ended up having to manually modify a handful of Python files that come with the `node-gyp` installation, plus a JavaScript Node.js file as well, and also installing missing C header `*.h` files. All the code changes I made I surrounde witha  global boolean flag that can be set/unset in the environment (I.e. `npm config set custom_fix true` or `npm config set custom_fix false`), this way it's quick and easy to appreciate the behavior with and without the custom fixes.
 
 All the files I modified are in a hidden .node-gyp folder of this repo which overlays over the respective path in the node-gyp folder structure. For example, [.node-gyp/lib/configure.js](.node-gyp/lib/configure.js) corresponds to the `<parent path>/node-gyp/lig/configure.js` that comes with the `node-gyp` installation. The same goes for the rest of the files I touched.
 
