@@ -113,7 +113,7 @@ is for some reason not detecting paths that begin with `C:\` as absolute. Not su
 
 `..\C:\Users\<my id>\AppData\Roaming\npm\node_modules\node-gyp\src\win_delay_load_hook.cc`
 
-What I did was develop my own custom function `_IsWindowsAbsPath(path)` and modified the `if` above:
+What I did was develop my own custom `_IsWindowsAbsPath(path)` function and modified the `if` above:
 
 ```
 ...
