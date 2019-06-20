@@ -11,7 +11,7 @@ If you're like me and have already spent days trying to get Node.js applications
    - [1. What help is already out there?](#1-what-help-is-already-out-there)   
    - [2. So what did I do about it?](#2-so-what-did-i-do-about-it)   
       - [2.1 ImportError: No module named gyp](#21-importerror-no-module-named-gyp)   
-      - [2.2 AttributeError: 'NoneType' object has no attribute 'upper'](#22-attributeerror-nonetype-object-has-no-attribute-upper) 
+      - [2.2 AttributeError: 'NoneType' object has no attribute 'upper'](#22-attributeerror-nonetype-object-has-no-attribute-upper)
       - [2.3 OSError: [Errno 2] No such file or directory: ... build/binding.sln.Xyz.tmp](#23-oserror-errno-2-no-such-file-or-directory-buildbindingslnxyztmp)   
       - [2.4 error MSB4184: The expression "[System.IO.Path]::GetFullPath](#24-error-msb4184-the-expression-systemiopathgetfullpath)   
       - [2.5 Missing C/C++ header files](#25-missing-cc-header-files)   
@@ -116,7 +116,7 @@ Build FAILED.^M
 "C:\...\<my module name>\node_modules\re2\build\binding.sln" (default target) (1) ->^M
 "C:\...\<my module name>\node_modules\re2\build\re2.vcxproj" (default target) (2) ->^M
 ```
-* **File(s) Changed** [.node-gyp/gyp/pylib/gyp/msvs.py](.node-gyp/gyp/pylib/gyp/msvs.py)
+* **File(s) Changed** [.node-gyp/gyp/pylib/gyp/generator/msvs.py](.node-gyp/gyp/pylib/gyp/generator/msvs.py)
 
 * **Issue Description** The Python check for absolute path that takes place in function `_FixPath(path)`:
 
