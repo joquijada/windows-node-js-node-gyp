@@ -293,7 +293,7 @@ function configure (gyp, argv, callback) {
        * 'C:Usersv094303AppDataLocalnode-gypCache11.9.0x64node.lib'
        * [C:\git\ecom\git-repo-inspector\node_modules\@data-leakage-protection\signatures\node_modules\re2\build\re2.vcxproj]^
        *
-       * The problem was that the backslashes needed to be escaped so that soe downstream process didnot eat
+       * The problem was that the backslashes needed to be escaped so downstream processes do not eat
        * them up, resulting in a bad path that was causing MSBuild.exe to fail
        */
       if (process.env['npm_config_custom_fix']) {
