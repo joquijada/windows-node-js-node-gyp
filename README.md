@@ -173,7 +173,6 @@ There were probably other ways of dealing with this, but I went ahead and added 
 ## 3. Other tips
 
 Some other tips that can help make your life easier.
----
 
 ### 3.1 Installing `Desktop development with C++`
 If you already have `Microsoft Visual Studio` installed but `npm install` warns about not being able to find the compiler, open `Microsoft Visual Studio`, enter `Desktop development with C++` in the search box, and then click to install. It was that easy for me on `Microsoft Visual Studio 2017 Professional`.
