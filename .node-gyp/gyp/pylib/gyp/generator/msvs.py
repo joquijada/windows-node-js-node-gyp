@@ -166,10 +166,14 @@ def _FixPath(path):
   if gyp.common.IsVerbose():
     print "CUSTOM: fixpath_prefix is " + fixpath_prefix
     print "CUSTOM: Path BEFORE conversion is " + path
+
+  #
   # CUSTOM: See documentation of _IsWindowsAbsPath(path) for details of why this function exists
+  #         Original `if` conditional was:   if fixpath_prefix and path and not os.path.isabs(path):
   if (fixpath_prefix and path and not os.path.isabs(path) 
       and (not gyp.common.IsCustomFixOn() or (not _IsWindowsAbsPath(path) and not path[0] == '$'))):
     path = os.path.join(fixpath_prefix, path)
+
   if gyp.common.IsVerbose():
     print "CUSTOM: Path AFTER path check is " + path
   
@@ -184,20 +188,6 @@ def _FixPath(path):
     print "CUSTOM: Path AFTER path = path[:-1] assignment is " + path
     print "CUSTOM: Path AFTER conversion is " + path
   
-  
-  if gyp.common.IsVerbose():
-    print "CUSTOM: path BEFORE slash fix is " + path
-    
-  # CUSTOM: To ensure all paths have forward slash (can't remember exact reason
-  #         why I added this, but I know there was a motive for it)
-  if gyp.common.IsCustomFixOn():
-    path = path.replace('\\', '/');
-    
-  if gyp.common.IsVerbose():
-    print "CUSTOM: path AFTER slash fix is " + path
-    
-  
-  path = _ChangeToAbsolutePath(path)
   return path
 
 
