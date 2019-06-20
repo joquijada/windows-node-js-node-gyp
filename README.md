@@ -61,7 +61,7 @@ npm verb lifecycle re2@1.8.4~install: unsafe-perm in lifecycle true
 * **File(s) Changed** None
 * **Issue Description** This happened only when I ran `npm install` in a Windows CMD shell. The fix was to set locale in the environment, `set LC_ALL=en_US.UTF-8`. On a Cygwin shell I did not experience this at all
 
-**Note: On `PowerShell` the syntax for setting environment variables is `$Env:<var name>=<var val>`.
+**Note: On `PowerShell` the syntax for setting environment variables is `$Env:<var name>=<var val>`.**
 
 ### OSError: [Errno 2] No such file or directory: ... build/binding.sln.Xyz.tmp
 
@@ -77,6 +77,51 @@ OSError: [Errno 2] No such file or directory: '/cygdrive/c/.../<pkg name>/node_m
 
 * **File(s) Changed** [.node-gyp/gyp/pylib/gyp/common.py](.node-gyp/gyp/pylib/gyp/common.py)
 * **Issue Description** Read the comments in [this file](.node-gyp/gyp/pylib/gyp/common.py), search for `CUSTOM: Removed the "dir" argument because`
+
+
+###  error MSB4184: The expression "[System.IO.Path]::GetFullPath
+---
+>Bellow is fuller error message, where you see `...\<my module name>` it's redactions I made to hide company secrets
+
+```
+Build started 6/20/2019 8:32:59 AM.^M
+Project "C:\...\<my module name>\node_modules\re2\build\binding.sln" on node 1 (default targets).^M
+ValidateSolutionConfiguration:^M
+  Building solution configuration "Release|x64".^M
+Project "C:\...\<my module name>\node_modules\re2\build\binding.sln" (1) is building "C:\...\<my module name>\node_modules\re2\build\re2.vcxproj" (2) on node 1 (default targets).^M
+C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\MSBuild\15.0\Bin\Microsoft.Common.CurrentVersion.targets(283,5): error MSB4184: The expression "[System.IO.Path]::GetFullPath(C:\...\<my module name>\node_modules\re2\build\..\C:\...\<my module name>\node_modules\re2\build\Release\)" cannot be evaluated. The given path's format is not supported. [C:\...\<my module name>\node_modules\re2\build\re2.vcxproj]^M
+Done Building Project "C:\...\<my module name>\node_modules\re2\build\re2.vcxproj" (default targets) -- FAILED.^M
+Done Building Project "C:\...\<my module name>\node_modules\re2\build\binding.sln" (default targets) -- FAILED.^M
+^M
+Build FAILED.^M
+^M
+"C:\...\<my module name>\node_modules\re2\build\binding.sln" (default target) (1) ->^M
+"C:\...\<my module name>\node_modules\re2\build\re2.vcxproj" (default target) (2) ->^M
+```
+* **File(s) Changed** [.node-gyp/gyp/pylib/gyp/msvs.py](.node-gyp/gyp/pylib/gyp/msvs.py)
+
+* **Issue Description** The Python check for absolute path that takes place in function `_FixPath(path)`:
+
+```
+...
+if fixpath_prefix and path and not os.path.isabs(path):
+  path = os.path.join(fixpath_prefix, path)
+...
+```
+
+is for some reason not detecting paths that begin with `C:\` as absolute. Not sure if it's a Cygwin config thing or what. Therefore it was ending up converting paths to the below, which is clearly incorrect (notice the `..\` in front):
+
+`..\C:\Users\<my id>\AppData\Roaming\npm\node_modules\node-gyp\src\win_delay_load_hook.cc`
+
+What I did was develop my own custom function `_IsWindowsAbsPath(path)` and modified the `if` above:
+
+```
+...
+if (fixpath_prefix and path and not os.path.isabs(path)
+      and (not gyp.common.IsCustomFixOn() or (not _IsWindowsAbsPath(path) and not path[0] == '$'))):
+  path = os.path.join(fixpath_prefix, path)
+...
+```
 
 ### Missing C/C++ header files
 ---
@@ -98,7 +143,8 @@ I found many of the missing `*.h` files at [https://raw.githubusercontent.com/no
 There were probably other ways of dealing with this, but I went ahead and added the escaping logic in `configure.js`. Refer to [that file](.node-gyp/lib/configure.js) and search for the `CUSTOM:` tag for details on the fix.
 
 ## Other tips
----
+Some other tips that can help make your life easier.
+
 ### Installing `Desktop development with C++`
 ---
 If you already have `Microsoft Visual Studio` installed but `npm install` warns about not being able to find the compiler, open `Microsoft Visual Studio`, enter `Desktop development with C++` in the search box, and then click to install. It was that easy for me on `Microsoft Visual Studio 2017 Professional`.
