@@ -30,7 +30,7 @@ All the files I modified are in a hidden .node-gyp folder of this repo which ove
 
 Below sections cover the issues encountered and files modified for each, in the order encountered. In the code I've added comments with the tag `CUSTOM:`, to identify code that I touched.
 
-**In addition I made things flag driven, so that you can easily/auto-magically toggle on/off the fixes made. To toggle on, set following `npm` environment flag:**
+**In addition, if you d decide to install the files I made things flag driven, so that you can easily/auto-magically toggle on/off the fixes made. To toggle on, set following `npm` environment flag:**
 
 `npm config set custom_logic true`
 
