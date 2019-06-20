@@ -164,12 +164,15 @@ def _FixPath(path):
   """
   
   if gyp.common.IsVerbose():
+    print "CUSTOM: fixpath_prefix is " + fixpath_prefix
     print "CUSTOM: Path BEFORE conversion is " + path
   # CUSTOM: See documentation of _IsWindowsAbsPath(path) for details of why this function exists
-  if fixpath_prefix and path and not os.path.isabs(path) and not _IsWindowsAbsPath(path) and not path[0] == '$':
+  if (fixpath_prefix and path and not os.path.isabs(path) 
+      and (not gyp.common.IsCustomFixOn() or (not _IsWindowsAbsPath(path) and not path[0] == '$'))):
     path = os.path.join(fixpath_prefix, path)
   if gyp.common.IsVerbose():
     print "CUSTOM: Path AFTER path check is " + path
+  
   path = path.replace('/', '\\')
   path = _NormalizedSource(path)
   if gyp.common.IsVerbose():
@@ -182,9 +185,14 @@ def _FixPath(path):
     print "CUSTOM: Path AFTER conversion is " + path
   
   
-  if gyp.common.IsVerbose():  
+  if gyp.common.IsVerbose():
     print "CUSTOM: path BEFORE slash fix is " + path
-  path = path.replace('\\', '/');
+    
+  # CUSTOM: To ensure all paths have forward slash (can't remember exact reason
+  #         why I added this, but I know there was a motive for it)
+  if gyp.common.IsCustomFixOn():
+    path = path.replace('\\', '/');
+    
   if gyp.common.IsVerbose():
     print "CUSTOM: path AFTER slash fix is " + path
     
@@ -195,13 +203,13 @@ def _FixPath(path):
 
 def _IsWindowsAbsPath(path):
   """
-  CUSTOM: The OOUT/Sock node-gyp version if this file is sometimes receives Windows absolute paths,
-  and it was think those were relative paths since they don't begin with a '/' or a '\'. As a result
+  CUSTOM: The OOTB/stock node-gyp version of this file sometimes receives Windows absolute paths,
+  and it was thinking those were relative paths since they don't begin with a '/' or a '\'. As a result
   some paths that ended up in the MS project file were looking like:
   
   '..\C:\<some path>\some_source_code_file.cc'
   
-  due to which the MSBuild compile step swiftly failed
+  due to which the MSBuild compile step swiftly failed.
   
   This method exists to close that gap.
   """
@@ -210,11 +218,11 @@ def _IsWindowsAbsPath(path):
 
 def _ChangeToAbsolutePath(path):
   """
-  CUSTOM: For some reason MS Visual Studio was balking at relative paths of C++ source code
-          in the project file. This method can be used to convert those to absolute paths, based
-          on the current directory which this process runs under
+  CUSTOM: For some reason MS Visual Studio was balking at relative paths of C++ source code files
+          in the project XML file. This method can be used to convert those to absolute paths, based
+          on the current directory which this process runs under.
   """
-  if os.path.isabs(path) or path[0] == '$' or _IsWindowsAbsPath(path):
+  if not gyp.common.IsCustomFixOn() or os.path.isabs(path) or path[0] == '$' or _IsWindowsAbsPath(path):
     return path
     
   if gyp.common.IsVerbose():

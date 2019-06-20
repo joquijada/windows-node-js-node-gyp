@@ -346,9 +346,13 @@ def WriteOnDiff(filename):
       #         and we ended up with current dir "/cygdrive/c/..." being prefixed to those, which was
       #         obviously a non-existent path, for example: "/cygdrive/c/<some folder>/C:\<my win style abs path>".
       #         See https://docs.python.org/2/library/tempfile.html#tempfile.mkstemp for more details
+      baseTempDir = "" if IsCustomFixOn() else os.path.split(filename)[0];
+      if IsVerbose():
+        print "CUSTOM: baseTempDir is " + baseTempDir
       tmp_fd, self.tmp_path = tempfile.mkstemp(
           suffix='.tmp',
-          prefix=os.path.split(filename)[1] + '.gyp.')
+          prefix=os.path.split(filename)[1] + '.gyp.',
+          dir=baseTempDir)
       if IsVerbose():
         print "CUSTOM: Temp solution file prefix is " + os.path.split(filename)[1] + '.gyp.'
         print "CUSTOM: Temp path (Writer.tmp_path) is " + self.tmp_path
@@ -624,3 +628,6 @@ def CrossCompileRequested():
           
 def IsVerbose():
   return os.environ['npm_config_loglevel'] and os.environ['npm_config_loglevel'] == 'verbose'
+
+def IsCustomFixOn():
+  return os.environ['npm_config_custom_fix'];

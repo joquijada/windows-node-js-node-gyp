@@ -16,9 +16,22 @@ import sys
 #         Issue link: https://github.com/nodejs/node-gyp/issues/1782
 #         for some reason `sys.argv[0]` gives back empty string
 #
-gypPath = os.path.join(sys.path[0], 'pylib')
+# CUSTOM: gyp module not loaded yet, hence cannot use gyp.common.IsCustomFixOn()
+gypPath = os.path.join(os.path.dirname(sys.argv[0]), 'pylib')
+if os.environ['npm_config_custom_fix']:
+  print "****************************"
+  print "*** CUSTOM FIXES ENABLED ***"
+  print "****************************"
+  gypPath = os.path.join(sys.path[0], 'pylib')
+else:
+  print "****************************"
+  print "*** CUSTOM FIXES DISABLED ***"
+  print "****************************"
+
 sys.path.insert(0, gypPath)
-print "CUSTOM: The path that will be used to load 'gyp' module is " + gypPath
+
+if os.environ['npm_config_loglevel'] and os.environ['npm_config_loglevel'] == 'verbose':
+  print "CUSTOM: The path that will be used to load 'gyp' module is " + gypPath
 
 import gyp
 

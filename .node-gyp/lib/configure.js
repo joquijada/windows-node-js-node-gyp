@@ -296,10 +296,15 @@ function configure (gyp, argv, callback) {
        * The problem was that the backslashes needed to be escaped so that soe downstream process didnot eat
        * them up, resulting in a bad path that was causing MSBuild.exe to fail
        */
-      nodeLibFile = nodeLibFile.replace(/\\/g, '\\\\')
+      if (process.env['npm_config_custom_fix']) {
+        nodeLibFile = nodeLibFile.replace(/\\/g, '\\\\')
+      }
 
-      if (process.env.loglevel && process.env.loglevel == 'verbose') {
-	    console.log("CUSTOM: nodeLibFile after escaping Windows backslashes is " + nodeLibFile)
+      if (process.env['npm_config_loglevel'] && process.env['npm_config_loglevel'] == 'verbose') {
+	    console.log("CUSTOM: nodeLibFile is " + nodeLibFile)
+	    Object.keys(process.env).forEach(function(e) {
+				  console.log("CUSTOM: NodeJS Env entry " + e + " is " + process.env[e]);
+	    });
 	  }
 
 
