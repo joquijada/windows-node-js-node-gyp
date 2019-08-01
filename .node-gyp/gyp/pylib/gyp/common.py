@@ -342,7 +342,7 @@ def WriteOnDiff(filename):
     def __init__(self):
       
       # Pick temporary file.
-      # CUSTOM: Removed the "dir" argument because it was causing C: paths to be treated as relative,
+      # CUSTOM: Removed the "dir" argument because it was causing `C:` prefixed paths to be treated as relative,
       #         and we ended up with current dir "/cygdrive/c/..." being prefixed to those, which was
       #         obviously a non-existent path, for example: "/cygdrive/c/<some folder>/C:\<my win style abs path>".
       #         See https://docs.python.org/2/library/tempfile.html#tempfile.mkstemp for more details
