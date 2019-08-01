@@ -1,7 +1,7 @@
 # Node JS on Windows+Cygwin
 > This repo captures my trials and tribulations trying to successfully install a Node.js application that depended on a native Node.js module, [re2](http://github.com/uhop/node-re2) in this case, which makes use of [node-gyp](https://github.com/nodejs/node-gyp) for compilation of `C++` code, needed for [Node.js addons](https://nodejs.org/api/addons.html). A GitHub issue related to this exists [here](https://github.com/nodejs/node-gyp/issues/1782)
 
-**Disclaimer/Caution: My approach involved modifying source code in the stock `node-gyp@v5.0.0` installation. Read/use this guide at your own leisure, it's not a guarantee that it will solve your issues. Ultimately you're responsible for resolving them, and making any back ups as necessary. Use this document mostly for informational purposes and I really wish it helps somebody.**
+**Disclaimer/Caution: My approach involved modifying source code in the stock `node-gyp@v5.0.0` installation. Read/use this guide at your own leisure, it's not a guarantee that it will solve your issues. Make backups as necessary, and I really wish it helps somebody.**
 
 If you're like me and have already spent days trying to get Node.js applications that rely on native Node.js modules to successfully install on a Windows+Cygwin combo (perhaps even just Windows alone), then read on, as this may benefit you. I had created [a GitHub issue for this as well](https://github.com/nodejs/node-gyp/issues/1782).
 
@@ -25,9 +25,9 @@ If you're like me and have already spent days trying to get Node.js applications
 
 ## 1. What help is already out there?
 
-The good news is that the Node.js community is already aware of some of the challenges faced with Node.js+Windows+native addons.
+The good news is that the Node.js community is already aware of some of the challenges faced with Node.js+Windows+native code addons.
 This README is based on [this guide](https://github.com/Microsoft/nodejs-guidelines/blob/master/windows-environment.md#compiling-native-addon-modules) which helps users troubleshoot Node.js issues on a Windows platform.
-However my situation was exacerbated by the fact that I sit inside an internal corporate network which governing team does not grant administrative rights that easily, if at all. Many solutions out there require administrative rights on your Windows machine (for example see `Option 1: Install all the required tools and configurations using Microsoft's windows-build-tools by running npm install -g windows-build-tools from an elevated PowerShell (run as Administrator).` in [this guide](https://github.com/Microsoft/nodejs-guidelines/blob/master/windows-environment.md#compiling-native-addon-modules)), of which I had none whatsoever. This meant that my options where severely abbreviated. For example I couldn't install the [windows build tools package](https://github.com/felixrieseberg/windows-build-tools) which might have alleviated my pain and suffering quicker. Instead I had to go for `Option 2: Install dependencies and configuration manually` described in [this document](https://github.com/Microsoft/nodejs-guidelines/blob/master/windows-environment.md#compiling-native-addon-modules).
+However my situation was exacerbated by the fact that I sit inside an internal corporate network which governing team does not grant administrative rights that easily, if at all. Many solutions out there require administrative rights on your Windows machine (for example see `Option 1: Install all the required tools and configurations using Microsoft's windows-build-tools by running npm install -g windows-build-tools from an elevated PowerShell (run as Administrator)` in [this guide](https://github.com/Microsoft/nodejs-guidelines/blob/master/windows-environment.md#compiling-native-addon-modules)), of which I had none whatsoever. This meant that my options where severely abbreviated. For example I couldn't install the [windows build tools package](https://github.com/felixrieseberg/windows-build-tools) which might have alleviated my pain and suffering quicker. Instead I had to go for `Option 2: Install dependencies and configuration manually` described in [this document](https://github.com/Microsoft/nodejs-guidelines/blob/master/windows-environment.md#compiling-native-addon-modules).
 I had also created [a GitHub issue](https://github.com/nodejs/node-gyp/issues/1782) seeking for some help.
 
 ## 2. So what did I do about it?
@@ -41,13 +41,13 @@ Firs off, some hardware/software versions I work with:
 * **node-gyp** 5.0.0 as of the time I wrote this (I have this installed globally, `npm install -g node-gyp`)
 * **Microsoft SDK Tools** Microsoft Visual Studio Professional 2017 v15.8.7/Desktop development with C++ workload
 
-To make a long story short and after hours of painstaking debugging Python and JavaScript code and running `npm install` with `--verbose` flag, I ended up having to manually modify a handful of Python files that come with the `node-gyp` installation, plus a JavaScript Node.js file as well, and also installing missing C header `*.h` files. All the code changes I made I surrounde witha  global boolean flag that can be set/unset in the environment (I.e. `npm config set custom_fix true` or `npm config set custom_fix false`), this way it's quick and easy to appreciate the behavior with and without the custom fixes.
+To make a long story short and after hours of painstaking debugging Python and JavaScript code and running `npm install` with `--verbose` flag, I ended up having to manually modify a handful of Python files that come with the `node-gyp` installation, plus a JavaScript Node.js file as well, and also installing missing C header `*.h` files. All the code changes I made I surrounded with a global boolean flag that can be set/unset in the environment (I.e. `npm config set custom_fix true` or `npm config set custom_fix false`), this way it's quick and easy to toggle on/off my patch.
 
-All the files I modified are in a hidden .node-gyp folder of this repo which overlays over the respective path in the node-gyp folder structure. For example, [.node-gyp/lib/configure.js](.node-gyp/lib/configure.js) corresponds to the `<parent path>/node-gyp/lig/configure.js` that comes with the `node-gyp` installation. The same goes for the rest of the files I touched.
+All the files I modified are in hidden [.node-gyp](./.node-gyp) folder of this repo. It overlays over the respective path in the `node-gyp` installation folder structure. For example, [.node-gyp/lib/configure.js](./.node-gyp/lib/configure.js) corresponds to the `<parent path>/node-gyp/lig/configure.js` that comes with the `node-gyp` installation. The same goes for the rest of the files I touched.
 
 Below sections cover the issues encountered and files modified for each, in the order encountered. In the code I've added comments with the tag `CUSTOM:`, to identify code that I touched.
 
-**In addition, if you do decide to install the files I made things flag driven, so that you can easily/auto-magically toggle on/off the fixes made. To toggle on, set following `npm` environment flag:**
+**For your convenience, if you do decide to install the files, I have made things flag driven, so that you can easily/auto-magically toggle on/off the fixes made. To toggle on, set following `npm` environment flag via command below:**
 
 `npm config set custom_logic true`
 
@@ -147,7 +147,7 @@ I heeded the advice given [here](https://github.com/Microsoft/nodejs-guidelines/
 
 * **File(s) Changed** Nothing changed, I just added the missing `*.h` files in the place where Microsoft SDK expects them. In my case I'm using `Visual Studio 2017 Professional`, and this is the parent path where I put them: `C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.15.26726\include`.
 You'll have to do some digging to see exactly what version you're using and the path to put them in. I just Google'ed around for that.
-For your convenience I've checked the [header files I needed in this repo](.include/), find him [here](.include/). They follow the same relative folder hierarchy that they should be in once installed into their final destination on the target machine.
+For your convenience I've checked the [header files I needed in this repo](.include/), find them [here](.include/). They follow the same relative folder hierarchy that they should be in once installed into their final destination on the target machine.
 I found many of the missing `*.h` files at [https://raw.githubusercontent.com/nodejs](https://raw.githubusercontent.com/nodejs). Others came with `node-gyp`, but I was able to find them only in a special area of the Windows "cache" that may be something like `C:\Users\<your user id>\AppData\Local\node-gyp\Cache\11.9.0\include` or `C:\Users\<your user id>\.node-gyp\11.9.0\include\node`
 
 * **Issue Description** Some of the `C++` in `<your module>/node_modules/re2/lib/` will fail to compile until all missing header (`*.h`) files are found, simple as that and no way around it. I guess it's a fact of life for those of us having to develop Node.js on Windows machines. Perhaps soon the Node.js team will address this in a more automated manner.
